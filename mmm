@@ -1,0 +1,199 @@
+#include <stdio.h>
+#include <iostream>
+#include <windows.h>
+#include <time.h>
+#include <conio.h>
+#include <stdlib.h>
+
+using namespace std;
+
+char map[22][52];
+int W=52;
+int H=22;
+int head;
+int direct=4;
+int isf;
+int food[2];
+char key;
+class snake1{
+    public:
+    int x;
+    int y;
+};
+
+snake1 snake[400];
+
+void init(){
+    head=0;
+	srand(time(0));
+	food[0] = rand() % 19 + 2;
+	food[1] = rand() % 49 + 2;//food[0]食物横坐标  food[1]食物纵坐标
+    isf=1;
+    for(int i=0;i<H;i++)
+        for(int j=0;j<W;j++){
+            if(i==0||j==0||i==H-1||j==W-1) map[i][j]='@';
+            else map[i][j]=' ';
+        }
+    snake[0].x=10;
+    snake[0].y=10;
+}
+void getkey() {
+	if (_kbhit()) {
+		key = _getch();
+	}
+	switch (key) {
+	case 'H'://用户按 上 键
+		if (direct != 2)
+			direct = 1;
+		break;
+	case 'P'://用户按 下 键
+		if (direct != 1)
+			direct = 2;
+		break;
+	case 'K'://用户按 左 键
+		if (direct != 4)
+			direct = 3;
+		break;
+	case 'M'://用户按 右 键
+		if (direct != 3)
+			direct = 4;
+		break;
+	}
+}
+
+int isfood(int x,int y){
+    if((x==food[0])&&(y==food[1])){
+        isf=0;
+        return 1;
+        
+    }
+    return 0;
+}
+void move() {//让蛇的坐标开始移动
+	int x, y;//作为临时交换的值  head为蛇头
+	x = snake[head].x;
+	y = snake[head].y;
+    if(direct==1) {
+        isfood(x-1,y);
+    }
+    else if(direct==2){
+        isfood(x+1,y);
+    }
+    else if(direct==3){
+        isfood(x,y-1);
+    }
+    else {
+        isfood(x,y+1);
+    }
+    if(isf){
+        if(direct==1){
+            snake[head].x--;
+        }
+        else if(direct==2){
+            snake[head].x++;
+        }
+        else if(direct==3){
+            snake[head].y--;
+        }
+        else if(direct==4){
+            snake[head].y++;
+        }
+        
+        for(int i=0;i<head-1;i++){
+            snake[i].x=snake[i+1].x;
+			snake[i].y=snake[i+1].y;
+        }
+		if(head>0){snake[head-1].x=x;
+		           snake[head-1].y=y;}
+    }
+    else{
+        snake[head+1].x=food[0];
+        snake[head+1].y=food[1];
+        head++;
+		food[0] = 0, food[1] = 0;
+    }
+}
+
+void makefood(){
+    int x,y;
+    int f=0;
+    srand((unsigned)time(NULL));
+    while(1){
+        x=rand()%49+2;
+        y=rand()%19+2;
+    for(int i=0;i<=head;i++){
+        if((snake[i].x!=y)||(snake[i].y!=x)) 
+        {f=1;break;};
+    }
+    if(f==1) {
+        food[0]=y;
+        food[1]=x;
+        break;}
+    }
+    isf=1;
+    
+}
+void makemap(){
+    for(int i=0;i<H;i++){
+        for(int j=0;j<W;j++){
+            if(i==0||j==0||i==H-1||j==W-1) map[i][j]='@';
+            else map[i][j]=' ';
+        }}
+    for(int i=0;i<=head;i++){
+        map[snake[i].x][snake[i].y]='#';
+    }
+    map[food[0]][food[1]]='$';
+
+}
+
+void showmap(){
+    for(int i=0;i<H;i++){
+        for(int j=0;j<W;j++){
+            printf("%c",map[i][j]);   
+        }
+        printf("\n");
+    }
+        
+}
+int gameover(){
+    
+    for(int i=0;i<head-3;i++){
+        if(snake[i].x==snake[head].x&&snake[i].y==snake[head].y)
+           return 1;
+        
+    }
+    if(snake[head].x==0||snake[head].x==21||snake[head].y==0||snake[head].y==51) return 1;
+    return 0;
+    
+}
+
+
+int main(){
+init();
+
+while(1){
+getkey();
+system("cls");
+Sleep(33);
+move();
+if(!isf) makefood();
+makemap();
+showmap();
+
+if(gameover()) {
+    printf("游戏结束，你的成绩为：%d", head);
+			break;
+}
+getkey();
+}
+
+
+system("pause");
+return 0;
+}
+
+
+
+
+ 
+ 
